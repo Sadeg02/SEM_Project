@@ -22,18 +22,32 @@ class TaxCalculator(object):
     advanceTax0 = 0
 
     def __init__(self, income=None, contractType=None):
-        # Initialize income and contract type if provided
-        if income is not None and contractType is not None:
+        # Initialize income
+        if income is not None:
             TaxCalculator.income = float(income)
+        else:
+            while True:
+                try:
+                    TaxCalculator.income = float(input("Enter income: "))
+                    break
+                except ValueError:
+                    print("Incorrect input. Please enter numeric value for income.")
+
+        # Initialize contract type
+        if contractType is not None:
             TaxCalculator.contractType = contractType.strip().upper()[0]
         else:
-            try:
-                # If no values are provided, ask the user for input
-                TaxCalculator.income = float(input("Enter income: "))
-                TaxCalculator.contractType = input("Contract Type: (E)mployment, (C)ivil")[0].upper()
-            except ValueError:
-                print("Incorrect")
-                return
+            while True:
+                user_input = input("Enter contract type (E for Employment, C for Civil): ").strip().upper()
+                if len(user_input) == 0:
+                    print("Input cannot be empty. Please enter 'E' or 'C'.")
+                    continue
+                TaxCalculator.contractType = user_input[0]
+                if TaxCalculator.contractType not in ("E", "C"):
+                    print("Incorrect input. Please enter 'E' for Employment or 'C' for Civil.")
+                else:
+                    break
+
 
         #After initialization, run the main logic
         self.main_logic()
