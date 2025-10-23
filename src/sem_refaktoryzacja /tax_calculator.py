@@ -36,6 +36,9 @@ class TaxCalculator(object):
         # Initialize contract type
         if contractType is not None:
             TaxCalculator.contractType = contractType.strip().upper()[0]
+            # validate provided contract type early (non-interactive use)
+            if TaxCalculator.contractType not in ("E", "C"):
+                raise ValueError("Incorrect contract type. Use 'E' for Employment or 'C' for Civil.")
         else:
             while True:
                 user_input = input("Enter contract type (E for Employment, C for Civil): ").strip().upper()
@@ -80,6 +83,8 @@ class TaxCalculator(object):
                   " rounded " + "{0:.0f}".format(TaxCalculator.advanceTax0))
             netIncome = TaxCalculator.income - ((TaxCalculator.t_socialSecurity + TaxCalculator.t_socialSecurityHealth
                                                  + TaxCalculator.t_socialSecuritySickness) + TaxCalculator.health_insurance_tax_rate_primary + TaxCalculator.advanceTax0)
+            # store computed net income for external use/tests
+            TaxCalculator.net_income = float("{0:.2f}".format(netIncome))
             print()
             print("Net income = " + "{0:.2f}".format(netIncome))
 
@@ -111,6 +116,8 @@ class TaxCalculator(object):
                   " rounded " + "{0:.0f}".format(TaxCalculator.advanceTax0))
             netIncome = TaxCalculator.income - ((TaxCalculator.t_socialSecurity + TaxCalculator.t_socialSecurityHealth
                                                  + TaxCalculator.t_socialSecuritySickness) + TaxCalculator.health_insurance_tax_rate_primary + TaxCalculator.advanceTax0)
+            # store computed net income for external use/tests
+            TaxCalculator.net_income = float("{0:.2f}".format(netIncome))
             print()
             print("Net income = " + "{0:.2f}".format(netIncome))
         else:

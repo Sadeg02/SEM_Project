@@ -1,4 +1,4 @@
-from TaxCalculator_en import TaxCalculator
+from tax_calculator import TaxCalculator
 
 if __name__=='__main__':
     # Tests with provided values
