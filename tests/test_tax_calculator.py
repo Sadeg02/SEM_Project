@@ -20,6 +20,15 @@ class TestTaxCalculator(unittest.TestCase):
         with self.assertRaises(ValueError):
             tax_calculator.TaxCalculator(1000, 'X')
 
+    def test_employment_and_civil_working_for_1000(self):
+        tax_calculator.TaxCalculator(1000, 'E')
+        net_e = tax_calculator.TaxCalculator.net_income
+        self.assertEqual(net_e, 763.24)
+        tax_calculator.TaxCalculator(1000, 'C')
+        net_c = tax_calculator.TaxCalculator.net_income
+        self.assertEqual(net_c, 728.24)
+    
+
     def test_zero_income_results_zero_net(self):
         tax_calculator.TaxCalculator(0, 'C')
         self.assertEqual(tax_calculator.TaxCalculator.net_income, 0.0)
@@ -27,13 +36,10 @@ class TestTaxCalculator(unittest.TestCase):
     def test_negative_income_results_negative_net(self):
         tax_calculator.TaxCalculator(-1000, 'E')
         self.assertLess(tax_calculator.TaxCalculator.net_income, 0)
+ 
+    
 
-    def test_civil_less_than_employment_for_1000(self):
-        tax_calculator.TaxCalculator(1000, 'E')
-        net_e = tax_calculator.TaxCalculator.net_income
-        tax_calculator.TaxCalculator(1000, 'C')
-        net_c = tax_calculator.TaxCalculator.net_income
-        self.assertLess(net_c, net_e)
+    
 
 
 if __name__ == '__main__':
