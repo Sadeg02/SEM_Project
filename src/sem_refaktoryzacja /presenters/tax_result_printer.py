@@ -99,8 +99,9 @@ class EmploymentPrintStrategy(PrintStrategy):
         return "EMPLOYMENT"
 
     def print_tax_details(self, calc, printer):
-        print(f"Tax free income = {printer._format_currency(settings.REDUCED_TAX)}")
-        reduced_tax = calc.advance_tax_base - settings.REDUCED_TAX
+        tax_free_amount = settings.REDUCED_TAX[settings.CONTRACT_TYPE_EMPLOYMENT]
+        print(f"Tax free income = {printer._format_currency(tax_free_amount)}")
+        reduced_tax = calc.advance_tax_base - tax_free_amount
         print(f"Reduced tax = {printer._format_currency(reduced_tax)}")
 
 

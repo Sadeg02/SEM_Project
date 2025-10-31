@@ -34,8 +34,16 @@ HEALTH_INSURANCE_RATE_FROM_TAX = 0.0775
 # Standard income tax rate - 18%
 TAX_RATE = 0.18
 
-# Tax-free amount (kwota wolna od podatku) - 46.33 PLN monthly
-REDUCED_TAX = 46.33
+# ========================================
+# Tax-Free Amount by Contract Type
+# ========================================
+# Tax-free amount (kwota wolna od podatku)
+# Employment: 46.33 PLN monthly
+# Civil: 0 PLN (no tax-free amount)
+REDUCED_TAX = {
+    CONTRACT_TYPE_EMPLOYMENT: 46.33,  # Employment contract - has tax-free amount
+    CONTRACT_TYPE_CIVIL: 0.0          # Civil contract - no tax-free amount
+}
 
 # ========================================
 # Deductible Expenses by Contract Type

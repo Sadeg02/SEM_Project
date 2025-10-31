@@ -20,8 +20,12 @@ import settings
 class TestTaxResultPrinter(unittest.TestCase):
 
     def setUp(self):
+        # Reset to default settings before each test for isolation
+        settings.REDUCED_TAX = {
+            settings.CONTRACT_TYPE_EMPLOYMENT: 46.33,
+            settings.CONTRACT_TYPE_CIVIL: 0.0
+        }
         self.printer = TaxResultPrinter()
-        settings.REDUCED_TAX = 46.33
 
     def test_format_currency_with_decimals(self):
         result = self.printer._format_currency(1234.56)
@@ -45,9 +49,13 @@ class TestTaxResultPrinter(unittest.TestCase):
 class TestEmploymentPrintStrategy(unittest.TestCase):
 
     def setUp(self):
+        # Reset to default settings before each test for isolation
+        settings.REDUCED_TAX = {
+            settings.CONTRACT_TYPE_EMPLOYMENT: 46.33,
+            settings.CONTRACT_TYPE_CIVIL: 0.0
+        }
         self.strategy = EmploymentPrintStrategy()
         self.printer = TaxResultPrinter()
-        settings.REDUCED_TAX = 46.33
 
     def test_get_contract_name(self):
         self.assertEqual(self.strategy.get_contract_name(), "EMPLOYMENT")
@@ -70,9 +78,13 @@ class TestEmploymentPrintStrategy(unittest.TestCase):
 class TestCivilPrintStrategy(unittest.TestCase):
 
     def setUp(self):
+        # Reset to default settings before each test for isolation
+        settings.REDUCED_TAX = {
+            settings.CONTRACT_TYPE_EMPLOYMENT: 46.33,
+            settings.CONTRACT_TYPE_CIVIL: 0.0
+        }
         self.strategy = CivilPrintStrategy()
         self.printer = TaxResultPrinter()
-        settings.REDUCED_TAX = 46.33
 
     def test_get_contract_name(self):
         self.assertEqual(self.strategy.get_contract_name(), "CIVIL")
@@ -94,8 +106,12 @@ class TestCivilPrintStrategy(unittest.TestCase):
 class TestPrinterOutput(unittest.TestCase):
 
     def setUp(self):
+        # Reset to default settings before each test for isolation
+        settings.REDUCED_TAX = {
+            settings.CONTRACT_TYPE_EMPLOYMENT: 46.33,
+            settings.CONTRACT_TYPE_CIVIL: 0.0
+        }
         self.printer = TaxResultPrinter()
-        settings.REDUCED_TAX = 46.33
 
     def test_employment_contract_output_contains_key_sections(self):
         calc = TaxCalculator(income=1000, contract_type='E')
