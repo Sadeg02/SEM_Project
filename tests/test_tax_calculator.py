@@ -4,11 +4,11 @@ import unittest
 
 # Ensure the module directory is importable when running tests
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-MODULE_DIR = os.path.join(ROOT, 'src', 'sem_refaktoryzacja ')
+MODULE_DIR = os.path.join(ROOT, 'src', 'tax_calculator')
 if MODULE_DIR not in sys.path:
     sys.path.insert(0, MODULE_DIR)
 
-import tax_calculator
+import calculator as tax_calculator
 
 
 class TestTaxCalculator(unittest.TestCase):

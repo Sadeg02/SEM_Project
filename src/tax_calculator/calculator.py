@@ -1,5 +1,5 @@
-from functions.initialization import initialization_of_tax_calculator
-from contracts.contract_strategy import ContractStrategyFactory
+from input_handlers.initialization import initialization_of_tax_calculator
+from strategies.contract_strategy import ContractStrategyFactory
 from tax_settings import TaxSettings
 
 

@@ -1,4 +1,4 @@
-from tax_calculator import TaxCalculator
+from calculator import TaxCalculator
 from presenters.tax_result_printer import TaxResultPrinter
 
 if __name__ == '__main__':

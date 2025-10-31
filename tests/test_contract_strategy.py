@@ -3,11 +3,11 @@ import os
 import unittest
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-MODULE_DIR = os.path.join(ROOT, 'src', 'sem_refaktoryzacja ')
+MODULE_DIR = os.path.join(ROOT, 'src', 'tax_calculator')
 if MODULE_DIR not in sys.path:
     sys.path.insert(0, MODULE_DIR)
 
-from contracts.contract_strategy import (
+from strategies.contract_strategy import (
     ContractStrategyFactory,
     ContractStrategy,
     EmploymentContractStrategy,

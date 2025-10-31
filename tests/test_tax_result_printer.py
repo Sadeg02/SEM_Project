@@ -4,7 +4,7 @@ import unittest
 from io import StringIO
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-MODULE_DIR = os.path.join(ROOT, 'src', 'sem_refaktoryzacja ')
+MODULE_DIR = os.path.join(ROOT, 'src', 'tax_calculator')
 if MODULE_DIR not in sys.path:
     sys.path.insert(0, MODULE_DIR)
 
@@ -14,7 +14,7 @@ from presenters.tax_result_printer import (
     EmploymentPrintStrategy,
     CivilPrintStrategy
 )
-from tax_calculator import TaxCalculator
+from calculator import TaxCalculator
 
 
 class TestPrintStrategyFactory(unittest.TestCase):
