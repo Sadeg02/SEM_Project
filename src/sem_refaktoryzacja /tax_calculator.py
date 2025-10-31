@@ -1,13 +1,16 @@
 from functions.initialization import initialization_of_tax_calculator
 from contracts.contract_strategy import ContractStrategyFactory
-
-import settings
+from tax_settings import TaxSettings
 
 
 class TaxCalculator(object):
     # Tax calculator using Strategy pattern for contract-specific rules
+    # Each instance has its own TaxSettings for isolation
 
-    def __init__(self, income=None, contract_type=None, auto_calculate=True):
+    def __init__(self, income=None, contract_type=None, auto_calculate=True, tax_settings=None):
+        # Each calculator gets its own settings instance
+        self.settings = tax_settings if tax_settings is not None else TaxSettings.default()
+
         # Initialize all instance variables
         self.gross_income = 0
         self.contract_type = ""
@@ -26,8 +29,8 @@ class TaxCalculator(object):
         # Initialize income and contract type
         initialization_of_tax_calculator(self, income, contract_type)
 
-        # Create appropriate strategy based on contract type
-        self.contract_strategy = ContractStrategyFactory.create_strategy(self.contract_type)
+        # Create appropriate strategy based on contract type, passing calculator's settings
+        self.contract_strategy = ContractStrategyFactory.create_strategy(self.contract_type, self)
 
         # Automatically run calculations if requested (default behavior)
         if auto_calculate:
@@ -47,15 +50,15 @@ class TaxCalculator(object):
         # Calculate all social security contributions and return income after deductions
         self.social_security_contribution = self._apply_rate(
             self.gross_income,
-            settings.SOCIAL_SECURITY_RATE
+            self.settings.social_security_rate
         )
         self.health_social_security_contribution = self._apply_rate(
             self.gross_income,
-            settings.HEALTH_SECURITY_RATE
+            self.settings.health_security_rate
         )
         self.sickness_social_security_contribution = self._apply_rate(
             self.gross_income,
-            settings.SICKNESS_SECURITY_RATE
+            self.settings.sickness_security_rate
         )
 
         return self._get_income_after_social_security()
@@ -72,11 +75,11 @@ class TaxCalculator(object):
         # Calculate health insurance contributions based on income after social security
         self.health_insurance_contribution = self._apply_rate(
             income_basis,
-            settings.HEALTH_INSURANCE_RATE_PRIMARY
+            self.settings.health_insurance_rate_primary
         )
         self.health_insurance_deductible = self._apply_rate(
             income_basis,
-            settings.HEALTH_INSURANCE_RATE_FROM_TAX
+            self.settings.health_insurance_rate_from_tax
         )
 
     # Step 3: Deductible Expenses (contract-specific)
@@ -101,7 +104,7 @@ class TaxCalculator(object):
 
     def _calculate_advance_tax_base(self, taxable_income):
         # Calculate base tax amount (18% of taxable income)
-        self.advance_tax_base = self._apply_rate(taxable_income, settings.TAX_RATE)
+        self.advance_tax_base = self._apply_rate(taxable_income, self.settings.tax_rate)
 
     def _calculate_advance_tax(self):
         # Calculate final advance tax after deductions (contract-specific)

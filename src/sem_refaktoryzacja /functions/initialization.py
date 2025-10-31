@@ -1,6 +1,3 @@
-import settings
-
-
 def initialization_of_tax_calculator(calculator_instance, income, contract_type):
     if income is not None:
             calculator_instance.gross_income = float(income)
@@ -16,7 +13,9 @@ def initialization_of_tax_calculator(calculator_instance, income, contract_type)
     if contract_type is not None:
         calculator_instance.contract_type = contract_type.strip().upper()[0]
         # validate provided contract type early (non-interactive use)
-        if calculator_instance.contract_type not in (settings.CONTRACT_TYPE_EMPLOYMENT, settings.CONTRACT_TYPE_CIVIL):
+        valid_types = (calculator_instance.settings.contract_type_employment,
+                      calculator_instance.settings.contract_type_civil)
+        if calculator_instance.contract_type not in valid_types:
             raise ValueError("Incorrect contract type. Use 'E' for Employment or 'C' for Civil.")
     else:
         while True:
@@ -25,7 +24,9 @@ def initialization_of_tax_calculator(calculator_instance, income, contract_type)
                 print("Input cannot be empty. Please enter 'E' or 'C'.")
                 continue
             calculator_instance.contract_type = user_input[0]
-            if calculator_instance.contract_type not in (settings.CONTRACT_TYPE_EMPLOYMENT, settings.CONTRACT_TYPE_CIVIL):
+            valid_types = (calculator_instance.settings.contract_type_employment,
+                          calculator_instance.settings.contract_type_civil)
+            if calculator_instance.contract_type not in valid_types:
                 print("Incorrect input. Please enter 'E' for Employment or 'C' for Civil.")
             else:
                 break

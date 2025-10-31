@@ -14,17 +14,12 @@ from presenters.tax_result_printer import (
     CivilPrintStrategy
 )
 from tax_calculator import TaxCalculator
-import settings
 
 
 class TestTaxResultPrinter(unittest.TestCase):
 
     def setUp(self):
-        # Reset to default settings before each test for isolation
-        settings.REDUCED_TAX = {
-            settings.CONTRACT_TYPE_EMPLOYMENT: 46.33,
-            settings.CONTRACT_TYPE_CIVIL: 0.0
-        }
+        # No need to reset settings - each TaxCalculator has isolated settings
         self.printer = TaxResultPrinter()
 
     def test_format_currency_with_decimals(self):
@@ -49,11 +44,7 @@ class TestTaxResultPrinter(unittest.TestCase):
 class TestEmploymentPrintStrategy(unittest.TestCase):
 
     def setUp(self):
-        # Reset to default settings before each test for isolation
-        settings.REDUCED_TAX = {
-            settings.CONTRACT_TYPE_EMPLOYMENT: 46.33,
-            settings.CONTRACT_TYPE_CIVIL: 0.0
-        }
+        # No need to reset settings - each TaxCalculator has isolated settings
         self.strategy = EmploymentPrintStrategy()
         self.printer = TaxResultPrinter()
 
@@ -78,11 +69,7 @@ class TestEmploymentPrintStrategy(unittest.TestCase):
 class TestCivilPrintStrategy(unittest.TestCase):
 
     def setUp(self):
-        # Reset to default settings before each test for isolation
-        settings.REDUCED_TAX = {
-            settings.CONTRACT_TYPE_EMPLOYMENT: 46.33,
-            settings.CONTRACT_TYPE_CIVIL: 0.0
-        }
+        # No need to reset settings - each TaxCalculator has isolated settings
         self.strategy = CivilPrintStrategy()
         self.printer = TaxResultPrinter()
 
@@ -106,11 +93,7 @@ class TestCivilPrintStrategy(unittest.TestCase):
 class TestPrinterOutput(unittest.TestCase):
 
     def setUp(self):
-        # Reset to default settings before each test for isolation
-        settings.REDUCED_TAX = {
-            settings.CONTRACT_TYPE_EMPLOYMENT: 46.33,
-            settings.CONTRACT_TYPE_CIVIL: 0.0
-        }
+        # No need to reset settings - each TaxCalculator has isolated settings
         self.printer = TaxResultPrinter()
 
     def test_employment_contract_output_contains_key_sections(self):
