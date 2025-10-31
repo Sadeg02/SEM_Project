@@ -4,7 +4,7 @@ import settings
 
 class TaxCalculator(object):
 
-    def __init__(self, income=None, contract_type=None):
+    def __init__(self, income=None, contract_type=None, auto_calculate=True):
         # Initialize all instance variables
         self.gross_income = 0
         self.contract_type = ""
@@ -21,75 +21,79 @@ class TaxCalculator(object):
 
         # Initialize income and contract type
         initialization_of_tax_calculator(self, income, contract_type)
-        #After initialization, run the main logic
-        self.main_logic()
 
-    def main_logic(self):
+        # Automatically run calculations if requested (default behavior)
+        if auto_calculate:
+            self.calculate()
+
+    def calculate(self):
         if self.contract_type == settings.CONTRACT_TYPE_EMPLOYMENT:
-            print("EMPLOYMENT")
-            print("Income ", self.gross_income)
-            income_after_social_security = self.calculate_income_after_social_security(self.gross_income)
-            print("Social security tax: "+"{0:.2f}".format(self.social_security_contribution))
-            print("Health social security tax: "+"{0:.2f}".format(self.health_social_security_contribution))
-            print("Sickness social security tax: "+"{0:.2f}".format(self.sickness_social_security_contribution))
-            print("Income basis for healt social security: ", income_after_social_security)
-            self.calculate_health_insurance(income_after_social_security)
-            print("Healt social security tax: 9% = " \
-                  + "{0:.2f}".format(self.health_insurance_contribution) + " 7,75% = " +
-                  "{0:.2f}".format(self.health_insurance_deductible))
-            print("Tax deductible expenses: ", self.deductible_expenses)
-            taxable_income = income_after_social_security - self.deductible_expenses
-            taxable_income_rounded = float("{0:.0f}".format(taxable_income))
-            print("Income: ", taxable_income, " rounded: " + "{0:.0f}".format(taxable_income_rounded))
-            self.calculate_advance_tax_base(taxable_income_rounded)
-            print("Advance tax 18% = ", self.advance_tax_base)
-            print("Tax free income =", settings.REDUCED_TAX)
-            reduced_tax = self.advance_tax_base - settings.REDUCED_TAX
-            print("Reduced tax = " + "{0:.2f}".format(reduced_tax))
-            self.calculate_advance_tax()
-            self.advance_tax_rounded = float("{0:.0f}".format(self.advance_tax))
-            print("Advance paid tax = " + "{0:.2f}".format(self.advance_tax) +
-                  " rounded " + "{0:.0f}".format(self.advance_tax_rounded))
-            net_income_calculated = self.gross_income - ((self.social_security_contribution + self.health_social_security_contribution
-                                                 + self.sickness_social_security_contribution) + self.health_insurance_contribution + self.advance_tax_rounded)
-            # store computed net income for external use/tests
-            self.net_income = float("{0:.2f}".format(net_income_calculated))
-            print()
-            print("Net income = " + "{0:.2f}".format(net_income_calculated))
-
+            self._calculate_employment_contract()
         elif self.contract_type == settings.CONTRACT_TYPE_CIVIL:
-            print("CIVIL")
-            print("Income", self.gross_income)
-            income_after_social_security = self.calculate_income_after_social_security(self.gross_income)
-            print("Social security tax: " + "{0:.2f}".format(self.social_security_contribution))
-            print("Health social security tax: " + "{0:.2f}".format(self.health_social_security_contribution))
-            print("Sickness social security tax  " + "{0:.2f}".format(self.sickness_social_security_contribution))
-            print("Income for calculating health security tax: ", income_after_social_security)
-            self.calculate_health_insurance(income_after_social_security)
-            print("Health security tax: 9% = " \
-                  + "{0:.2f}".format(self.health_insurance_contribution) + " 7,75% = " +
-                  "{0:.2f}".format(self.health_insurance_deductible))
-            settings.REDUCED_TAX = 0
-            self.deductible_expenses = income_after_social_security * settings.DEDUCTIBLE_EXPENSES["C"]
-            print("Tax deductible expenses = ", self.deductible_expenses)
-            taxable_income = income_after_social_security - self.deductible_expenses
-            taxable_income_rounded = float("{0:.0f}".format(taxable_income))
-            print("income to be taxed: ", taxable_income, " rounded: " + "{0:.0f}".format(taxable_income_rounded))
-            self.calculate_advance_tax_base(taxable_income_rounded)
-            print("Advance tax 18% =", self.advance_tax_base)
-            print("Already paid tax = " + "{0:.2f}".format(self.advance_tax_base))
-            self.calculate_advance_tax()
-            self.advance_tax_rounded = float("{0:.0f}".format(self.advance_tax))
-            print("Advance tax = " + "{0:.2f}".format(self.advance_tax) +
-                  " rounded " + "{0:.0f}".format(self.advance_tax_rounded))
-            net_income_calculated = self.gross_income - ((self.social_security_contribution + self.health_social_security_contribution
-                                                 + self.sickness_social_security_contribution) + self.health_insurance_contribution + self.advance_tax_rounded)
-            # store computed net income for external use/tests
-            self.net_income = float("{0:.2f}".format(net_income_calculated))
-            print()
-            print("Net income = " + "{0:.2f}".format(net_income_calculated))
+            self._calculate_civil_contract()
         else:
-            print("Unknown type of contract!")
+            raise ValueError(f"Unknown contract type: {self.contract_type}")
+
+    def _calculate_employment_contract(self):
+        # Calculate taxes for employment contract
+        # Calculate social security contributions
+        income_after_social_security = self.calculate_income_after_social_security(self.gross_income)
+
+        # Calculate health insurance
+        self.calculate_health_insurance(income_after_social_security)
+
+        # Deductible expenses are fixed for employment contracts
+        # (already set in __init__)
+
+        # Calculate taxable income
+        taxable_income = income_after_social_security - self.deductible_expenses
+        taxable_income_rounded = float("{0:.0f}".format(taxable_income))
+
+        # Calculate advance tax
+        self.calculate_advance_tax_base(taxable_income_rounded)
+        self.calculate_advance_tax()
+        self.advance_tax_rounded = float("{0:.0f}".format(self.advance_tax))
+
+        # Calculate net income
+        net_income_calculated = self.gross_income - (
+            (self.social_security_contribution +
+             self.health_social_security_contribution +
+             self.sickness_social_security_contribution) +
+            self.health_insurance_contribution +
+            self.advance_tax_rounded
+        )
+        self.net_income = float("{0:.2f}".format(net_income_calculated))
+
+    def _calculate_civil_contract(self):
+        # Calculate taxes for civil contract
+        # Calculate social security contributions
+        income_after_social_security = self.calculate_income_after_social_security(self.gross_income)
+
+        # Calculate health insurance
+        self.calculate_health_insurance(income_after_social_security)
+
+        # For civil contracts, no tax-free amount and different deductible expenses
+        settings.REDUCED_TAX = 0
+        self.deductible_expenses = income_after_social_security * settings.DEDUCTIBLE_EXPENSES[settings.CONTRACT_TYPE_CIVIL]
+
+        # Calculate taxable income
+        taxable_income = income_after_social_security - self.deductible_expenses
+        taxable_income_rounded = float("{0:.0f}".format(taxable_income))
+
+        # Calculate advance tax
+        self.calculate_advance_tax_base(taxable_income_rounded)
+        self.calculate_advance_tax()
+        self.advance_tax_rounded = float("{0:.0f}".format(self.advance_tax))
+
+        # Calculate net income
+        net_income_calculated = self.gross_income - (
+            (self.social_security_contribution +
+             self.health_social_security_contribution +
+             self.sickness_social_security_contribution) +
+            self.health_insurance_contribution +
+            self.advance_tax_rounded
+        )
+        self.net_income = float("{0:.2f}".format(net_income_calculated))
 
     def calculate_advance_tax(self):
         self.advance_tax = self.advance_tax_base - self.health_insurance_deductible - settings.REDUCED_TAX
