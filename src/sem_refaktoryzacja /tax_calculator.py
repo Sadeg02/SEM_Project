@@ -1,15 +1,9 @@
 from functions.initialization import initialization_of_tax_calculator    
 
+import settings
+
 class TaxCalculator(object):
     income = 0
-
-    SOCIAL_SECURITY_RATE = 9.76 / 100
-    HEALTH_SECURITY_RATE = 1.5 / 100
-    SICKNESS_SECURITY_RATE = 2.45 / 100
-    HEALTH_INSURANCE_RATE_PRIMARY = 9 / 100
-    HEALTH_INSURANCE_RATE_FROM_TAX = 7.75 / 100
-    TAX_RATE = 18 / 100
-    REDUCED_TAX = 46.33
 
     contractType = ""
     t_socialSecurity = 0 
@@ -26,8 +20,6 @@ class TaxCalculator(object):
     def __init__(self, income=None, contractType=None):
         # Initialize income
         initialization_of_tax_calculator(TaxCalculator, income, contractType)
-
-
         #After initialization, run the main logic
         self.main_logic()
 
@@ -50,8 +42,8 @@ class TaxCalculator(object):
             print("Income: ", taxedIncome, " rounded: " + "{0:.0f}".format(taxedIncome0))
             TaxCalculator.calculateTax(taxedIncome0)
             print("Advance tax 18% = ", TaxCalculator.t_advance)
-            print("Tax free income =", TaxCalculator.REDUCED_TAX)
-            taxPaid = TaxCalculator.t_advance - TaxCalculator.REDUCED_TAX
+            print("Tax free income =", settings.REDUCED_TAX)
+            taxPaid = TaxCalculator.t_advance - settings.REDUCED_TAX
             print("Reduced tax = " + "{0:.2f}".format(taxPaid))
             TaxCalculator.calculateAdvanceTax()
             TaxCalculator.advanceTax0 = float("{0:.0f}".format(TaxCalculator.advanceTax))
@@ -76,8 +68,8 @@ class TaxCalculator(object):
             print("Health security tax: 9% = " \
                   + "{0:.2f}".format(TaxCalculator.health_insurance_tax_rate_primary) + " 7,75% = " +
                   "{0:.2f}".format(TaxCalculator.health_insurance_tax_secondary))
-            TaxCalculator.REDUCED_TAX = 0
-            TaxCalculator.t_deductibleExpenses = (d_income * 20) / 100
+            settings.REDUCED_TAX = 0
+            TaxCalculator.t_deductibleExpenses = d_income * settings.DEDUCTIBLE_EXPENSES["C"]
             print("Tax deductible expenses = ", TaxCalculator.t_deductibleExpenses)
             taxedIncome = d_income - TaxCalculator.t_deductibleExpenses
             taxedIncome0 = float("{0:.0f}".format(taxedIncome))
@@ -101,20 +93,20 @@ class TaxCalculator(object):
 
     @staticmethod
     def calculateAdvanceTax():
-        TaxCalculator.advanceTax = TaxCalculator.t_advance - TaxCalculator.health_insurance_tax_secondary - TaxCalculator.REDUCED_TAX
+        TaxCalculator.advanceTax = TaxCalculator.t_advance - TaxCalculator.health_insurance_tax_secondary - settings.REDUCED_TAX
 
     @staticmethod
     def calculateTax(income):
-        TaxCalculator.t_advance = (income * 18) / 100
+        TaxCalculator.t_advance = income * settings.TAX_RATE
 
     @staticmethod
     def calculateIncome(income):
-        TaxCalculator.t_socialSecurity = (income * 9.76) / 100        
-        TaxCalculator.t_socialSecurityHealth = (income * 1.5) / 100
-        TaxCalculator.t_socialSecuritySickness = (income * 2.45) / 100
+        TaxCalculator.t_socialSecurity = income * settings.SOCIAL_SECURITY_RATE
+        TaxCalculator.t_socialSecurityHealth = income * settings.HEALTH_SECURITY_RATE
+        TaxCalculator.t_socialSecuritySickness = income * settings.SICKNESS_SECURITY_RATE
         return (income - TaxCalculator.t_socialSecurity - TaxCalculator.t_socialSecurityHealth - TaxCalculator.t_socialSecuritySickness)
 
     @staticmethod
     def calculateOtherTaxes(income):
-        TaxCalculator.health_insurance_tax_rate_primary = (income * 9) / 100
-        TaxCalculator.health_insurance_tax_secondary = (income * 7.75) / 100
+        TaxCalculator.health_insurance_tax_rate_primary = income * settings.HEALTH_INSURANCE_RATE_PRIMARY
+        TaxCalculator.health_insurance_tax_secondary = income * settings.HEALTH_INSURANCE_RATE_FROM_TAX
