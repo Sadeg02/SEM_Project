@@ -10,10 +10,24 @@ if MODULE_DIR not in sys.path:
 
 from presenters.tax_result_printer import (
     TaxResultPrinter,
+    PrintStrategyFactory,
     EmploymentPrintStrategy,
     CivilPrintStrategy
 )
 from tax_calculator import TaxCalculator
+
+
+class TestPrintStrategyFactory(unittest.TestCase):
+
+    def test_create_employment_strategy(self):
+        calc = TaxCalculator(income=1000, contract_type='E')
+        strategy = PrintStrategyFactory.create_strategy(calc)
+        self.assertIsInstance(strategy, EmploymentPrintStrategy)
+
+    def test_create_civil_strategy(self):
+        calc = TaxCalculator(income=1000, contract_type='C')
+        strategy = PrintStrategyFactory.create_strategy(calc)
+        self.assertIsInstance(strategy, CivilPrintStrategy)
 
 
 class TestTaxResultPrinter(unittest.TestCase):
@@ -35,9 +49,10 @@ class TestTaxResultPrinter(unittest.TestCase):
         self.assertEqual(result, "1235")
 
     def test_calculate_income_after_social_security(self):
+        # Test that calculator properly calculates income after social security deductions
         calc = TaxCalculator(income=1000, contract_type='E')
-        result = self.printer._calculate_income_after_social_security(calc)
-        expected = 1000 - 97.6 - 15.0 - 24.5
+        result = calc._get_income_after_social_security()
+        expected = 1000 - 97.6 - 15.0 - 24.5  # income - social - health - sickness
         self.assertAlmostEqual(result, expected, places=2)
 
 

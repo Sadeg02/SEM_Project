@@ -8,10 +8,6 @@ import settings as global_settings
 
 @dataclass
 class TaxSettings:
-    """
-    Configuration object holding all tax calculation settings.
-    Each TaxCalculator instance has its own TaxSettings for isolation.
-    """
 
     # Contract type constants
     contract_type_employment: str = field(default=global_settings.CONTRACT_TYPE_EMPLOYMENT)
@@ -46,10 +42,10 @@ class TaxSettings:
 
     @classmethod
     def default(cls):
-        """Create TaxSettings with default values from global settings module"""
+        # Create TaxSettings with default values from global settings module
         return cls()
 
     def copy(self, **changes):
-        """Create a copy of settings with specified changes"""
+        # Create a copy of settings with specified changes
         from dataclasses import replace
         return replace(self, **changes)

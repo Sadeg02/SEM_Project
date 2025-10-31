@@ -1,18 +1,21 @@
-import settings
+class PrintStrategyFactory:
+    # Factory for creating appropriate print strategy based on contract type
+
+    @staticmethod
+    def create_strategy(calculator):
+        if calculator.contract_type == calculator.settings.contract_type_employment:
+            return EmploymentPrintStrategy()
+        elif calculator.contract_type == calculator.settings.contract_type_civil:
+            return CivilPrintStrategy()
+        else:
+            raise ValueError(f"Unknown contract type: {calculator.contract_type}")
 
 
 class TaxResultPrinter:
     # Handles printing of tax calculation results using Template Method pattern
 
     def print_results(self, calculator):
-        if calculator.contract_type == settings.CONTRACT_TYPE_EMPLOYMENT:
-            strategy = EmploymentPrintStrategy()
-        elif calculator.contract_type == settings.CONTRACT_TYPE_CIVIL:
-            strategy = CivilPrintStrategy()
-        else:
-            print("Unknown type of contract!")
-            return
-
+        strategy = PrintStrategyFactory.create_strategy(calculator)
         self._print_with_strategy(calculator, strategy)
 
     def _print_with_strategy(self, calc, strategy):
@@ -42,18 +45,18 @@ class TaxResultPrinter:
         for label, amount in contributions:
             print(f"{label}: {self._format_currency(amount)}")
 
-        income_after_social = self._calculate_income_after_social_security(calc)
-        print(f"Income basis for healt social security: {self._format_currency(income_after_social)}")
+        income_after_social = calc._get_income_after_social_security()
+        print(f"Income basis for health social security: {self._format_currency(income_after_social)}")
 
     def _print_health_insurance_section(self, calc):
-        print(f"Healt social security tax: 9% = {self._format_currency(calc.health_insurance_contribution)} "
+        print(f"Health social security tax: 9% = {self._format_currency(calc.health_insurance_contribution)} "
               f"7,75% = {self._format_currency(calc.health_insurance_deductible)}")
 
     def _print_deductible_expenses_section(self, calc):
         print(f"Tax deductible expenses = {self._format_currency(calc.deductible_expenses)}")
 
     def _print_taxable_income_section(self, calc):
-        income_after_social = self._calculate_income_after_social_security(calc)
+        income_after_social = calc._get_income_after_social_security()
         taxable_income = income_after_social - calc.deductible_expenses
         taxable_income_rounded = float("{0:.0f}".format(taxable_income))
 
@@ -76,12 +79,6 @@ class TaxResultPrinter:
     def _format_rounded(self, amount):
         return "{0:.0f}".format(amount)
 
-    def _calculate_income_after_social_security(self, calc):
-        return (calc.gross_income -
-                calc.social_security_contribution -
-                calc.health_social_security_contribution -
-                calc.sickness_social_security_contribution)
-
 
 class PrintStrategy:
     # Base strategy for contract-specific printing variations
@@ -99,7 +96,8 @@ class EmploymentPrintStrategy(PrintStrategy):
         return "EMPLOYMENT"
 
     def print_tax_details(self, calc, printer):
-        tax_free_amount = settings.REDUCED_TAX[settings.CONTRACT_TYPE_EMPLOYMENT]
+        contract_type = calc.settings.contract_type_employment
+        tax_free_amount = calc.settings.reduced_tax[contract_type]
         print(f"Tax free income = {printer._format_currency(tax_free_amount)}")
         reduced_tax = calc.advance_tax_base - tax_free_amount
         print(f"Reduced tax = {printer._format_currency(reduced_tax)}")
